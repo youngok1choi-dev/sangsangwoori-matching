@@ -9,7 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const selectCls = "w-full h-12 rounded-lg border border-input bg-transparent px-3 text-lg outline-none focus:border-ring focus:ring-2 focus:ring-ring/50 text-foreground";
 
 const REGIONS = ['서울', '경기', '인천', '기타'];
 const JOB_TYPES = ['경비', '청소', '조리', '돌봄', '기타'];
@@ -195,18 +196,26 @@ export default function AdminPage() {
                 <div className="flex flex-col gap-2">
                   <Label className="text-lg font-semibold">지역 *</Label>
                   {errors.region && <div className="rounded bg-red-100 border border-red-400 text-red-700 text-base px-3 py-2">{errors.region}</div>}
-                  <Select value={form.region} onValueChange={(v) => setForm({ ...form, region: v })}>
-                    <SelectTrigger className="text-lg h-12"><SelectValue placeholder="지역 선택" /></SelectTrigger>
-                    <SelectContent>{REGIONS.map((r) => <SelectItem key={r} value={r} className="text-lg">{r}</SelectItem>)}</SelectContent>
-                  </Select>
+                  <select
+                    value={form.region}
+                    onChange={(e) => setForm({ ...form, region: e.target.value })}
+                    className={selectCls}
+                  >
+                    <option value="">지역 선택</option>
+                    {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+                  </select>
                 </div>
                 <div className="flex flex-col gap-2">
                   <Label className="text-lg font-semibold">직종 *</Label>
                   {errors.job_type && <div className="rounded bg-red-100 border border-red-400 text-red-700 text-base px-3 py-2">{errors.job_type}</div>}
-                  <Select value={form.job_type} onValueChange={(v) => setForm({ ...form, job_type: v })}>
-                    <SelectTrigger className="text-lg h-12"><SelectValue placeholder="직종 선택" /></SelectTrigger>
-                    <SelectContent>{JOB_TYPES.map((j) => <SelectItem key={j} value={j} className="text-lg">{j}</SelectItem>)}</SelectContent>
-                  </Select>
+                  <select
+                    value={form.job_type}
+                    onChange={(e) => setForm({ ...form, job_type: e.target.value })}
+                    className={selectCls}
+                  >
+                    <option value="">직종 선택</option>
+                    {JOB_TYPES.map((j) => <option key={j} value={j}>{j}</option>)}
+                  </select>
                 </div>
               </div>
 
