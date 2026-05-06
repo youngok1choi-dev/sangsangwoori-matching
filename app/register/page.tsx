@@ -37,26 +37,31 @@ export default function RegisterPage() {
     setErrors({});
     setNewSeniorId(null);
     setLoading(true);
-    const { data: senior, error } = await supabase
-      .from('seniors')
-      .insert({
-        name: form.name.trim(),
-        region: form.region,
-        desired_job: form.desired_job,
-        career_years: parseInt(form.career_years) || 0,
-      })
-      .select()
-      .single();
-    if (error || !senior) {
-      setErrors({ name: '저장 중 오류가 발생했습니다. 다시 시도해 주세요.' });
+    try {
+      const { data: senior, error } = await supabase
+        .from('seniors')
+        .insert({
+          name: form.name.trim(),
+          region: form.region,
+          desired_job: form.desired_job,
+          career_years: parseInt(form.career_years) || 0,
+        })
+        .select()
+        .single();
+      if (error || !senior) {
+        console.error('[register] INSERT error:', error);
+        setErrors({ name: `저장 중 오류가 발생했습니다: ${error?.message ?? '알 수 없는 오류'}` });
+        return;
+      }
+      await recalculateMatchesForSenior(senior.id);
+      setNewSeniorId(senior.id);
+      setForm({ name: '', region: '', desired_job: '', career_years: '0' });
+    } catch (err) {
+      console.error('[register] 예외 발생:', err);
+      setErrors({ name: '저장 중 오류가 발생했습니다. 브라우저 콘솔을 확인해 주세요.' });
+    } finally {
       setLoading(false);
-      return;
     }
-    // 트리거 대신 앱 레이어에서 재계산
-    await recalculateMatchesForSenior(senior.id);
-    setLoading(false);
-    setNewSeniorId(senior.id);
-    setForm({ name: '', region: '', desired_job: '', career_years: '0' });
   }
 
   return (

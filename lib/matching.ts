@@ -13,16 +13,19 @@ function calcScore(
 
 /** 새 시니어 등록 후 호출 — 해당 시니어 × 전체 일자리 매칭 재계산 */
 export async function recalculateMatchesForSenior(seniorId: string): Promise<void> {
-  const [{ data: senior }, { data: jobs }] = await Promise.all([
+  const [{ data: senior, error: e1 }, { data: jobs, error: e2 }] = await Promise.all([
     supabase.from('seniors').select('*').eq('id', seniorId).single(),
     supabase.from('jobs').select('*'),
   ]);
+  if (e1) console.error('[matching] seniors 조회 오류:', e1);
+  if (e2) console.error('[matching] jobs 조회 오류:', e2);
   if (!senior || !jobs) return;
 
-  await supabase.from('matches').delete().eq('senior_id', seniorId);
+  const { error: delErr } = await supabase.from('matches').delete().eq('senior_id', seniorId);
+  if (delErr) console.error('[matching] matches DELETE 오류:', delErr);
   if (jobs.length === 0) return;
 
-  await supabase.from('matches').insert(
+  const { error: insErr } = await supabase.from('matches').insert(
     jobs.map((job) => ({
       senior_id: seniorId,
       job_id: job.id,
@@ -30,17 +33,20 @@ export async function recalculateMatchesForSenior(seniorId: string): Promise<voi
       status: 'pending',
     }))
   );
+  if (insErr) console.error('[matching] matches INSERT 오류:', insErr);
 }
 
 /** 새 일자리 등록 후 호출 — 해당 일자리 × 전체 시니어 매칭 계산 후 추가 */
 export async function recalculateMatchesForJob(jobId: string): Promise<void> {
-  const [{ data: job }, { data: seniors }] = await Promise.all([
+  const [{ data: job, error: e1 }, { data: seniors, error: e2 }] = await Promise.all([
     supabase.from('jobs').select('*').eq('id', jobId).single(),
     supabase.from('seniors').select('*'),
   ]);
+  if (e1) console.error('[matching] jobs 조회 오류:', e1);
+  if (e2) console.error('[matching] seniors 조회 오류:', e2);
   if (!job || !seniors || seniors.length === 0) return;
 
-  await supabase.from('matches').insert(
+  const { error: insErr } = await supabase.from('matches').insert(
     seniors.map((senior) => ({
       senior_id: senior.id,
       job_id: jobId,
@@ -48,4 +54,5 @@ export async function recalculateMatchesForJob(jobId: string): Promise<void> {
       status: 'pending',
     }))
   );
+  if (insErr) console.error('[matching] matches INSERT 오류:', insErr);
 }
