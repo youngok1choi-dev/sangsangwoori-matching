@@ -66,7 +66,7 @@ export default async function RecommendationsPage({
     .eq('senior_id', seniorId)
     .order('score', { ascending: false });
 
-  const matches = ((raw ?? []) as MatchRow[]).filter((m) => m.score > 0);
+  const matches = ((raw ?? []) as unknown as MatchRow[]).filter((m) => m.score > 0);
 
   return (
     <div className="max-w-2xl mx-auto">
