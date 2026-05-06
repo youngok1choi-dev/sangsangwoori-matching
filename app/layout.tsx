@@ -8,6 +8,7 @@ const geist = Geist({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "상상우리 — 시니어 일자리 매칭",
   description: "시니어와 일자리를 자동으로 연결하는 매칭 시스템",
+  robots: "index, follow",
 };
 
 export default function RootLayout({
