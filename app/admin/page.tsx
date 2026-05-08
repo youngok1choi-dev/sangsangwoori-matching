@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { AlertTriangle, Clock, CheckCircle2 } from 'lucide-react';
 
 const selectCls = "w-full h-12 rounded-lg border border-input bg-transparent px-3 text-lg outline-none focus:border-ring focus:ring-2 focus:ring-ring/50 text-foreground";
 
@@ -35,9 +36,9 @@ function getMaxScore(matches: MatchInfo[]): number {
 }
 
 const STATUS_CONFIG = {
-  unmatched: { label: '미매칭', badgeClass: 'bg-gray-500', desc: '아직 매칭되지 않은 시니어' },
-  pending:   { label: '매칭 대기', badgeClass: 'bg-yellow-500', desc: '매칭은 됐으나 배정 전 검토 중' },
-  assigned:  { label: '배정 완료', badgeClass: 'bg-green-600', desc: '일자리 배정이 확정된 시니어' },
+  unmatched: { label: '미매칭',   Icon: AlertTriangle, badgeClass: 'bg-gray-500',   desc: '아직 매칭되지 않은 시니어' },
+  pending:   { label: '매칭 대기', Icon: Clock,         badgeClass: 'bg-yellow-500', desc: '매칭은 됐으나 배정 전 검토 중' },
+  assigned:  { label: '배정 완료', Icon: CheckCircle2,  badgeClass: 'bg-green-600',  desc: '일자리 배정이 확정된 시니어' },
 } as const;
 
 export default function AdminPage() {
@@ -104,27 +105,33 @@ export default function AdminPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-2">담당자 대시보드</h1>
-      <p className="text-muted-foreground mb-8">매칭 현황을 한눈에 확인하고 배정을 관리하세요.</p>
+      <h1 className="text-4xl font-bold mb-2">담당자 대시보드</h1>
+      <p className="text-lg text-muted-foreground mb-8">매칭 현황을 한눈에 확인하고 배정을 관리하세요.</p>
 
-      {/* 집계 카드 */}
+      {/* 집계 카드 3개 */}
       <div className="grid grid-cols-3 gap-4 mb-10">
-        {(Object.keys(STATUS_CONFIG) as Array<keyof typeof STATUS_CONFIG>).map((key) => (
-          <Card key={key}>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{STATUS_CONFIG[key].label}</CardTitle>
-                <Badge className={`text-white ${STATUS_CONFIG[key].badgeClass}`}>{stats[key]}명</Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">{STATUS_CONFIG[key].desc}</p>
-            </CardContent>
-          </Card>
-        ))}
+        {(Object.keys(STATUS_CONFIG) as Array<keyof typeof STATUS_CONFIG>).map((key) => {
+          const { label, Icon, badgeClass, desc } = STATUS_CONFIG[key];
+          return (
+            <Card key={key}>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Icon className="w-6 h-6 text-muted-foreground" />
+                    <CardTitle className="text-lg">{label}</CardTitle>
+                  </div>
+                  <Badge className={`text-white text-base px-3 py-1 ${badgeClass}`}>{stats[key]}명</Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-base text-muted-foreground">{desc}</p>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
-      {/* 시니어 목록 테이블 */}
+      {/* 시니어 목록 */}
       <section className="mb-14">
         <h2 className="text-2xl font-bold mb-4">시니어 목록 ({seniors.length}명)</h2>
         <Card>
@@ -163,7 +170,9 @@ export default function AdminPage() {
                           </td>
                           <td className="py-3">
                             <Link href={`/recommendations?senior_id=${senior.id}`}>
-                              <Button variant="outline" size="sm" className="text-base">상세 보기</Button>
+                              <Button variant="outline" size="sm" className="text-base h-10 px-4">
+                                상세 보기
+                              </Button>
                             </Link>
                           </td>
                         </tr>
@@ -181,45 +190,36 @@ export default function AdminPage() {
       <section>
         <h2 className="text-2xl font-bold mb-6 border-t pt-8">일자리 관리</h2>
 
-        {/* 일자리 추가 폼 */}
         <Card className="mb-8">
           <CardHeader><CardTitle className="text-xl">일자리 추가</CardTitle></CardHeader>
           <CardContent>
             <form onSubmit={handleAddJob} className="flex flex-col gap-5">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1">
                 <Label className="text-lg font-semibold">공고명 *</Label>
                 {errors.title && <div className="rounded bg-red-100 border border-red-400 text-red-700 text-base px-3 py-2">{errors.title}</div>}
                 <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="예: 아파트 경비원 모집" className="text-lg h-12" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1">
                   <Label className="text-lg font-semibold">지역 *</Label>
                   {errors.region && <div className="rounded bg-red-100 border border-red-400 text-red-700 text-base px-3 py-2">{errors.region}</div>}
-                  <select
-                    value={form.region}
-                    onChange={(e) => setForm({ ...form, region: e.target.value })}
-                    className={selectCls}
-                  >
+                  <select value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value })} className={selectCls}>
                     <option value="">지역 선택</option>
                     {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1">
                   <Label className="text-lg font-semibold">직종 *</Label>
                   {errors.job_type && <div className="rounded bg-red-100 border border-red-400 text-red-700 text-base px-3 py-2">{errors.job_type}</div>}
-                  <select
-                    value={form.job_type}
-                    onChange={(e) => setForm({ ...form, job_type: e.target.value })}
-                    className={selectCls}
-                  >
+                  <select value={form.job_type} onChange={(e) => setForm({ ...form, job_type: e.target.value })} className={selectCls}>
                     <option value="">직종 선택</option>
                     {JOB_TYPES.map((j) => <option key={j} value={j}>{j}</option>)}
                   </select>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1">
                 <Label className="text-lg font-semibold">요구 경력 (년)</Label>
                 <Input type="number" min={0} value={form.required_career} onChange={(e) => setForm({ ...form, required_career: e.target.value })} className="text-lg h-12 max-w-xs" />
               </div>
@@ -231,7 +231,6 @@ export default function AdminPage() {
           </CardContent>
         </Card>
 
-        {/* 일자리 목록 */}
         <Card>
           <CardHeader><CardTitle className="text-xl">등록된 일자리 ({jobs.length}건)</CardTitle></CardHeader>
           <CardContent>
@@ -257,9 +256,9 @@ export default function AdminPage() {
                         <td className="py-3 pr-4">{job.job_type}</td>
                         <td className="py-3 pr-4">{job.required_career}년 이상</td>
                         <td className="py-3">
-                          <Button variant="destructive" size="sm" className="text-base px-4"
+                          <Button variant="destructive" size="sm" className="text-base h-10 px-4"
                             disabled={deletingId === job.id} onClick={() => handleDelete(job.id)}>
-                            {deletingId === job.id ? '삭제 중...' : '삭제'}
+                            {deletingId === job.id ? '삭제 중...' : '삭제 확인'}
                           </Button>
                         </td>
                       </tr>

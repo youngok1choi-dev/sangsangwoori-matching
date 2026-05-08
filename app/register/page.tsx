@@ -66,14 +66,14 @@ export default function RegisterPage() {
 
   return (
     <div className="max-w-xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">시니어 프로필 등록</h1>
-      <p className="text-muted-foreground mb-8">
+      <h1 className="text-4xl font-bold mb-2">시니어 일자리 신청하기</h1>
+      <p className="text-lg text-muted-foreground mb-8">
         정보를 입력하시면 맞춤 일자리를 추천해 드립니다.
       </p>
 
       {newSeniorId && (
-        <div className="mb-6 rounded-lg bg-green-100 border border-green-500 text-green-800 text-lg px-5 py-4 flex flex-col gap-2">
-          <p className="font-semibold">✓ 등록이 완료되었습니다</p>
+        <div className="mb-6 rounded-lg bg-green-100 border-2 border-green-500 text-green-800 text-lg px-5 py-4 flex flex-col gap-2">
+          <p className="font-bold text-xl">✓ 등록이 완료되었습니다. 담당자가 곧 연락드립니다.</p>
           <Link
             href={`/recommendations?senior_id=${newSeniorId}`}
             className="underline font-medium hover:text-green-900"
@@ -92,9 +92,11 @@ export default function RegisterPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+
             {/* 이름 */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               <Label htmlFor="name" className="text-lg font-semibold">이름 *</Label>
+              <p className="text-base text-muted-foreground">성함을 입력해 주세요</p>
               {errors.name && (
                 <div className="rounded bg-red-100 border border-red-400 text-red-700 text-base px-3 py-2">{errors.name}</div>
               )}
@@ -109,8 +111,9 @@ export default function RegisterPage() {
             </div>
 
             {/* 지역 */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               <Label htmlFor="region" className="text-lg font-semibold">지역 *</Label>
+              <p className="text-base text-muted-foreground">어디에서 일하고 싶으세요?</p>
               {errors.region && (
                 <div className="rounded bg-red-100 border border-red-400 text-red-700 text-base px-3 py-2">{errors.region}</div>
               )}
@@ -126,8 +129,9 @@ export default function RegisterPage() {
             </div>
 
             {/* 희망 직종 */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               <Label htmlFor="desired_job" className="text-lg font-semibold">희망 직종 *</Label>
+              <p className="text-base text-muted-foreground">어떤 일을 하시겠어요?</p>
               {errors.desired_job && (
                 <div className="rounded bg-red-100 border border-red-400 text-red-700 text-base px-3 py-2">{errors.desired_job}</div>
               )}
@@ -143,8 +147,9 @@ export default function RegisterPage() {
             </div>
 
             {/* 경력 */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               <Label htmlFor="career_years" className="text-lg font-semibold">경력 (년)</Label>
+              <p className="text-base text-muted-foreground">몇 년 동안 일하셨나요?</p>
               <input
                 id="career_years"
                 type="number"
@@ -155,7 +160,11 @@ export default function RegisterPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full h-14 text-xl font-bold bg-blue-600 hover:bg-blue-700 mt-2" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full h-14 text-xl font-bold bg-blue-600 hover:bg-blue-700 mt-2"
+              disabled={loading}
+            >
               {loading ? '저장 및 매칭 중...' : '등록하기'}
             </Button>
           </form>

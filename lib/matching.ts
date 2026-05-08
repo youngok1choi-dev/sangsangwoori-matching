@@ -1,13 +1,29 @@
 import { supabase, type Senior, type Job } from './supabase';
 
+const REGION_MAP: Record<string, string> = {
+  '서울특별시': '서울',
+  '경기도':     '경기',
+  '인천광역시': '인천',
+};
+
+const JOB_MAP: Record<string, string> = {
+  '경비직': '경비',
+  '청소직': '청소',
+  '조리직': '조리',
+  '돌봄직': '돌봄',
+};
+
+function normalizeRegion(r: string)  { return REGION_MAP[r]  ?? r; }
+function normalizeJob(j: string)     { return JOB_MAP[j]     ?? j; }
+
 function calcScore(
   senior: Pick<Senior, 'region' | 'desired_job' | 'career_years'>,
   job: Pick<Job, 'region' | 'job_type' | 'required_career'>
 ): number {
   let score = 0;
-  if (senior.region === job.region) score += 3;           // 지역 일치 +3
-  if (senior.desired_job === job.job_type) score += 2;    // 직종 일치 +2
-  if (senior.career_years >= job.required_career) score += 1; // 경력 충족 +1
+  if (normalizeRegion(senior.region)  === normalizeRegion(job.region))   score += 3;
+  if (normalizeJob(senior.desired_job) === normalizeJob(job.job_type))   score += 2;
+  if (senior.career_years >= job.required_career)                         score += 1;
   return score; // 최대 6점
 }
 
